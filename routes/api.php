@@ -22,7 +22,11 @@ Route::prefix('transactions')->group(function () {
 Route::prefix('dashboard')->group(function () {
     Route::get('/summary', [DashboardController::class, 'summary']);
     Route::get('/sales-by-category', [DashboardController::class, 'categorySales']);
+    Route::get('/sales-by-region', [DashboardController::class, 'regionSales']);
+    Route::get('/sales-by-state', [DashboardController::class, 'stateSales']);
     Route::get('/top-products', [DashboardController::class, 'bestSelling']);
     Route::get('/monthly-trend', [DashboardController::class, 'salesTrend']);
+    Route::get('/sales-by-segment', [DashboardController::class, 'segmentSales']);
+    Route::get('/daily-trend', [DashboardController::class, 'dailyTrend']);
     Route::get('/complete', [DashboardController::class, 'complete']);
 });

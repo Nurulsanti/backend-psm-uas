@@ -60,7 +60,39 @@ class DashboardController extends Controller
 
         return response()->json($bestSelling);
     }
+    public function regionSales()
+    {
+        $regionSales = DB::table('transactions')
+            ->join('regions', 'transactions.region_id', '=', 'regions.id')
+            ->select('regions.region', DB::raw('COALESCE(SUM(transactions.sales), 0) as sales'))
+            ->groupBy('regions.region')
+            ->get()
+            ->map(function($item) {
+                return [
+                    'region' => $item->region,
+                    'sales' => (float)($item->sales ?? 0),
+                ];
+            });
 
+        return response()->json($regionSales);
+    }
+
+    public function stateSales()
+    {
+        $stateSales = DB::table('transactions')
+            ->join('regions', 'transactions.region_id', '=', 'regions.id')
+            ->select('regions.state', DB::raw('COALESCE(SUM(transactions.sales), 0) as sales'))
+            ->groupBy('regions.state')
+            ->get()
+            ->map(function($item) {
+                return [
+                    'state' => $item->state,
+                    'sales' => (float)($item->sales ?? 0),
+                ];
+            });
+
+        return response()->json($stateSales);
+    }
     public function salesTrend(Request $request)
     {
         $salesTrend = DB::table('transactions')
@@ -89,5 +121,45 @@ class DashboardController extends Controller
             'best_selling' => $this->bestSelling()->getData(),
             'sales_trend' => $this->salesTrend(request())->getData(),
         ]);
+    }
+
+    public function dailyTrend(Request $request)
+    {
+        $days = $request->get('days', 7);
+        
+        $dailySales = DB::table('transactions')
+            ->select(
+                DB::raw("DATE(transaction_date) as date"),
+                DB::raw('COALESCE(SUM(sales), 0) as sales')
+            )
+            ->where('transaction_date', '>=', DB::raw("DATE('now', '-{$days} days')"))
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get()
+            ->map(function($item) {
+                return [
+                    'date' => $item->date,
+                    'sales' => (float)($item->sales ?? 0),
+                ];
+            });
+
+        return response()->json($dailySales);
+    }
+
+    public function segmentSales()
+    {
+        $segmentSales = DB::table('transactions')
+            ->join('customers', 'transactions.customer_id', '=', 'customers.id')
+            ->select('customers.segment', DB::raw('COALESCE(SUM(transactions.sales), 0) as sales'))
+            ->groupBy('customers.segment')
+            ->get()
+            ->map(function($item) {
+                return [
+                    'segment' => $item->segment,
+                    'sales' => (float)($item->sales ?? 0),
+                ];
+            });
+
+        return response()->json($segmentSales);
     }
 }
