@@ -24,6 +24,7 @@ Route::prefix('dashboard')->group(function () {
     Route::get('/sales-by-category', [DashboardController::class, 'categorySales']);
     Route::get('/sales-by-region', [DashboardController::class, 'regionSales']);
     Route::get('/sales-by-state', [DashboardController::class, 'stateSales']);
+    Route::get('/sales-by-city', [DashboardController::class, 'citySales']);
     Route::get('/top-products', [DashboardController::class, 'bestSelling']);
     Route::get('/monthly-trend', [DashboardController::class, 'salesTrend']);
     Route::get('/sales-by-segment', [DashboardController::class, 'segmentSales']);

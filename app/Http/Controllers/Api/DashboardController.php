@@ -16,12 +16,14 @@ class DashboardController extends Controller
         $totalProfit = Transaction::sum('profit') ?? 0;
         $totalOrders = Transaction::count() ?? 0;
         $avgOrderValue = $totalOrders > 0 ? $totalSales / $totalOrders : 0;
+        $totalCustomers = DB::table('customers')->count() ?? 0;
 
         return response()->json([
             'total_sales' => (float)$totalSales,
             'total_profit' => (float)$totalProfit,
             'total_orders' => (int)$totalOrders,
             'avg_order_value' => (float)$avgOrderValue,
+            'total_customers' => (int)$totalCustomers,
         ]);
     }
 
@@ -162,4 +164,23 @@ class DashboardController extends Controller
 
         return response()->json($segmentSales);
     }
+
+    public function citySales()
+    {
+        $citySales = DB::table('transactions')
+            ->join('regions', 'transactions.region_id', '=', 'regions.id')
+            ->select('regions.city', DB::raw('COALESCE(SUM(transactions.sales), 0) as sales'))
+            ->groupBy('regions.city')
+            ->orderByDesc('sales')
+            ->get()
+            ->map(function($item) {
+                return [
+                    'city' => $item->city,
+                    'sales' => (float)($item->sales ?? 0),
+                ];
+            });
+
+        return response()->json($citySales);
+    }
+
 }
