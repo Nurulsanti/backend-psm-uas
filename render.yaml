@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: backend-psm-uas
+    env: php
+    buildCommand: composer install --no-dev --optimize-autoloader
+    startCommand: php -S 0.0.0.0:$PORT -t public
+    envVars:
+      - key: APP_KEY
+        value: base64:Mn1t2iBES5tU6zP92fKBfM6xmeG2ZWnvsJj1BSPQc/A=
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: APP_URL
+        sync: false
